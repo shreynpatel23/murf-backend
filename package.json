@@ -10,5 +10,8 @@
     "global": "^4.4.0",
     "mongoose": "^5.9.19",
     "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "start": "nodemon index.js"
   }
 }

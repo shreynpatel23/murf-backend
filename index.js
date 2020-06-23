@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require("mongoose");
 const ForumController = require("./controller/forum");
 const PostController = require("./controller/post");
+const AuthController = require("./controller/auth");
 
 // use this command to configure the dotenv file.
 require("dotenv").config();
@@ -16,11 +17,15 @@ const db_url = process.env.ATLAS_URI;
 const connection = mongoose.connection;
 
 // establishing the connection
-mongoose.connect(db_url, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
+mongoose
+  .connect(db_url, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // print success message once the connection is established.
 connection.once("open", () => {
@@ -30,8 +35,9 @@ connection.once("open", () => {
 app.use(cors());
 app.use(express.json());
 
-app.use("/forum", ForumController);
-app.use("/post", PostController);
+app.use("/auth", AuthController);
+app.use("/forums", ForumController);
+app.use("/posts", PostController);
 
 app.listen(port, () => {
   console.log(`server is running on ${port}`);

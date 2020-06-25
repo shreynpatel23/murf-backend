@@ -10,15 +10,19 @@ router.route("/").get(verify, (_, response) => {
     .catch((err) => response.json(err));
 });
 
-router.route("/new-forum").post(verify, (request, response) => {
-  const forumName = request.body.forumName;
-  // create a new forum object with the new forum name.
-  const newForum = new Forum({ forumName });
-  // use the new forum object to save the data in the database
-  newForum
-    .save()
-    .then((forum) => response.json(forum))
-    .catch((err) => response.json(err));
+router.route("/new-forum").post(verify, async (request, response) => {
+  try {
+    const forumName = request.body.forumName;
+    // create a new forum object with the new forum name.
+    const newForum = await new Forum({ forumName });
+    // use the new forum object to save the data in the database
+    newForum
+      .save()
+      .then((forum) => response.json(forum))
+      .catch((err) => response.status(400).json(err.message));
+  } catch (err) {
+    response.status(400).json(err);
+  }
 });
 
 module.exports = router;

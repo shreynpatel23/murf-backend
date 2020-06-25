@@ -15,11 +15,8 @@ const UserSchema = new Schema(
       min: 6,
       max: 200,
     },
-    password: {
+    imageUrl: {
       type: String,
-      required: true,
-      min: 6,
-      max: 1200,
     },
   },
   { timestamps: true }

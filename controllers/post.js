@@ -11,6 +11,17 @@ exports.getAllPosts = (_, response) => {
   }
 };
 
+exports.getPostById = (request, response) => {
+  try {
+    const id = request.params.id;
+    Post.findById(id)
+      .then((post) => response.json(post))
+      .catch((err) => response.json(err));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
 exports.addNewPost = async (request, response) => {
   try {
     const id = request.body.id;

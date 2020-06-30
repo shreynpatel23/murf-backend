@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
-const ForumController = require("./controller/forum");
-const PostController = require("./controller/post");
-const AuthController = require("./controller/auth");
+const ForumController = require("./routes/forum");
+const PostController = require("./routes/post");
+const AuthController = require("./routes/auth");
+const verify = require("./routes/verifyRoutes");
 
 // use this command to configure the dotenv file.
 require("dotenv").config();
@@ -35,9 +36,9 @@ connection.once("open", () => {
 app.use(cors());
 app.use(express.json());
 
-app.use("/auth", AuthController);
-app.use("/forums", ForumController);
-app.use("/posts", PostController);
+app.use(AuthController);
+app.use("/forums", verify, ForumController);
+app.use("/posts", verify, PostController);
 
 app.listen(port, () => {
   console.log(`server is running on ${port}`);

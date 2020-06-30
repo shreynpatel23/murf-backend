@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
   {
-    id: {
-      type: String,
-      required: true,
-    },
     headerText: {
       type: String,
     },

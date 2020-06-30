@@ -7,6 +7,17 @@ exports.getAllForums = (_, response) => {
     .catch((err) => response.json(err));
 };
 
+exports.getForumById = (request, response) => {
+  try {
+    const id = request.params.id;
+    Forum.findById(id)
+      .then((forum) => response.json(forum))
+      .catch((err) => response.json(err));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
 exports.addNewForum = async (request, response) => {
   try {
     // check if the forum already exist or not.

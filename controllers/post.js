@@ -1,16 +1,17 @@
-const router = require("express").Router();
-let Post = require("../modals/post.modal");
-// use the verify method to check for the auth-token token.
-const verify = require("../controller/verifyRoutes");
+const Post = require("../modals/post.modal");
 
-router.route("/").get(verify, (_, response) => {
-  // the below function returns a promise.
-  Post.find()
-    .then((forum) => response.json(forum))
-    .catch((err) => response.json(err));
-});
+exports.getAllPosts = (_, response) => {
+  try {
+    // the below function returns a promise.
+    Post.find()
+      .then((forum) => response.json(forum))
+      .catch((err) => response.status(400).json(err));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
 
-router.route("/new-post").post(verify, async (request, response) => {
+exports.addNewPost = async (request, response) => {
   try {
     const id = request.body.id;
     const headerText = request.body.headerText;
@@ -42,6 +43,4 @@ router.route("/new-post").post(verify, async (request, response) => {
   } catch (err) {
     response.status(400).json(err);
   }
-});
-
-module.exports = router;
+};

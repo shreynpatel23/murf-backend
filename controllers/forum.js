@@ -1,17 +1,21 @@
-const router = require("express").Router();
-let Forum = require("../modals/forum.modal");
-// use the verify method to check for the auth-token token.
-const verify = require("../controller/verifyRoutes");
+const Forum = require("../modals/forum.modal");
 
-router.route("/").get(verify, (_, response) => {
+exports.getAllForums = (_, response) => {
   // the below function returns a promise.
   Forum.find()
     .then((forum) => response.json(forum))
     .catch((err) => response.json(err));
-});
+};
 
-router.route("/new-forum").post(verify, async (request, response) => {
+exports.addNewForum = async (request, response) => {
   try {
+    // check if the forum already exist or not.
+    const forumAlreadyExist = await Forum.findOne({
+      forumName: request.body.forumName,
+    });
+    if (forumAlreadyExist)
+      return response.status(400).json({ message: "Forum name already exist" });
+
     const forumName = request.body.forumName;
     // create a new forum object with the new forum name.
     const newForum = await new Forum({ forumName });
@@ -23,6 +27,4 @@ router.route("/new-forum").post(verify, async (request, response) => {
   } catch (err) {
     response.status(400).json(err);
   }
-});
-
-module.exports = router;
+};

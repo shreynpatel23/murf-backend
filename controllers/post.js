@@ -24,7 +24,7 @@ exports.getPostById = (request, response) => {
 
 exports.addNewPost = async (request, response) => {
   try {
-    const id = request.body.id;
+    const userId = request.body.userId;
     const headerText = request.body.headerText;
     const bodyText = request.body.bodyText;
     const tags = request.body.tags;
@@ -34,8 +34,7 @@ exports.addNewPost = async (request, response) => {
     const pinned = request.body.pinned;
     const saved = request.body.saved;
     const liked = request.body.liked;
-    const newPost = await new Post({
-      id,
+    const newPost = new Post({
       headerText,
       bodyText,
       tags,
@@ -45,6 +44,7 @@ exports.addNewPost = async (request, response) => {
       pinned,
       saved,
       liked,
+      userId,
     });
 
     newPost

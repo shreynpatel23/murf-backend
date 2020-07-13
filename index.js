@@ -14,8 +14,6 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 // use this variable to connect to the database
 const db_url = process.env.ATLAS_URI;
-// use this variable to establish the connection.
-const connection = mongoose.connection;
 
 // establishing the connection
 mongoose
@@ -24,14 +22,16 @@ mongoose
     useCreateIndex: true,
     useUnifiedTopology: true,
   })
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`server is running on ${port}`);
+      // print success message once the connection is established.
+      console.log("connection established");
+    });
+  })
   .catch((err) => {
     console.log(err);
   });
-
-// print success message once the connection is established.
-connection.once("open", () => {
-  console.log("connection established");
-});
 
 app.use(cors());
 app.use(express.json());
@@ -39,7 +39,3 @@ app.use(express.json());
 app.use(AuthController);
 app.use("/forums", verify, ForumController);
 app.use("/posts", verify, PostController);
-
-app.listen(port, () => {
-  console.log(`server is running on ${port}`);
-});

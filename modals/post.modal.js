@@ -30,6 +30,11 @@ const postSchema = new Schema(
     liked: {
       type: Boolean,
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,

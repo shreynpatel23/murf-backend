@@ -3,6 +3,20 @@ const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
   {
+    forumId: {
+      type: Schema.Types.ObjectId,
+      ref: "Forum",
+      required: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    liked: {
+      count: Number,
+      isLiked: Boolean,
+    },
     headerText: {
       type: String,
     },
@@ -20,20 +34,13 @@ const postSchema = new Schema(
     },
     postedBy: {
       type: String,
+      ref: "User",
     },
     pinned: {
       type: Boolean,
     },
     saved: {
       type: Boolean,
-    },
-    liked: {
-      type: Boolean,
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
     },
   },
   {

@@ -1,5 +1,6 @@
 const Forum = require("../modals/forum.modal");
 
+// Get all forum controller
 exports.getAllForums = (_, response) => {
   // the below function returns a promise.
   Forum.find()
@@ -7,6 +8,7 @@ exports.getAllForums = (_, response) => {
     .catch((err) => response.json(err));
 };
 
+// Get forum by id controller
 exports.getForumById = (request, response) => {
   try {
     const id = request.params.id;
@@ -18,6 +20,7 @@ exports.getForumById = (request, response) => {
   }
 };
 
+// Add new forum controller
 exports.addNewForum = async (request, response) => {
   try {
     // check if the forum already exist or not.
@@ -28,8 +31,11 @@ exports.addNewForum = async (request, response) => {
       return response.status(400).json({ message: "Forum name already exist" });
 
     const forumName = request.body.forumName;
+    const userId = request.body.userId;
+    const userName = request.body.userName;
+    const theme = request.body.theme;
     // create a new forum object with the new forum name.
-    const newForum = await new Forum({ forumName });
+    const newForum = new Forum({ forumName, userName, theme, userId });
     // use the new forum object to save the data in the database
     newForum
       .save()
@@ -38,4 +44,22 @@ exports.addNewForum = async (request, response) => {
   } catch (err) {
     response.status(400).json(err);
   }
+};
+
+// update a forum controller
+exports.updateForum = (request, response) => {
+  const userName = request.body.userName;
+  const theme = request.body.theme;
+  try {
+    Forum.findById(request.params.id)
+      .then((forum) => {
+        forum.userName = userName;
+        forum.theme = theme;
+        return forum.save();
+      })
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((err) => response.status(400).json(err.message));
+  } catch (err) {}
 };

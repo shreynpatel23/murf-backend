@@ -10,4 +10,7 @@ router.get("/:id", postController.getPostById);
 // routes for add a new Post.
 router.post("/new-post", postController.addNewPost);
 
+// routes for getting all posts of a user.
+router.post("/get-posts", postController.getAllPostsOfUser);
+
 module.exports = router;

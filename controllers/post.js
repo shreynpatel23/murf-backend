@@ -1,5 +1,5 @@
 const Post = require("../modals/post.modal");
-
+const Forum = require("../modals/forum.modal");
 // function to get all post of the forum
 exports.getAllPosts = (_, response) => {
   try {
@@ -7,6 +7,7 @@ exports.getAllPosts = (_, response) => {
     Post.find()
       .populate("userId")
       .then((post) => {
+        console.log(post);
         response.json(post);
       })
       .catch((err) => response.status(400).json(err));
@@ -50,6 +51,13 @@ exports.getAllPostsOfUser = async (request, response) => {
 // function for adding a new post
 exports.addNewPost = async (request, response) => {
   try {
+    // check if the forum exist or not.
+    const forumAlreadyExist = await Forum.findOne({
+      _id: request.body.forumId,
+    });
+    if (!forumAlreadyExist)
+      return response.status(400).json({ message: "Forum Does not exist" });
+
     const userId = request.body.userId;
     const forumId = request.body.forumId;
     const headerText = request.body.headerText;

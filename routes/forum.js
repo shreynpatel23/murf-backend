@@ -11,6 +11,6 @@ router.get("/:id", ForumController.getForumById);
 router.post("/new-forum", ForumController.addNewForum);
 
 // routes for update forum.
-router.post("/:id/update-forum", ForumController.updateForum);
+// router.post("/:id/update-forum", ForumController.updateForum);
 
 module.exports = router;

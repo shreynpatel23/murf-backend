@@ -7,10 +7,6 @@ const forumSchema = new Schema(
       type: String,
       required: true,
     },
-    userName: {
-      type: String,
-      required: true,
-    },
     theme: {
       type: String,
       required: true,

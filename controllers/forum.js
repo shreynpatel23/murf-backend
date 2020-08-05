@@ -30,12 +30,12 @@ exports.addNewForum = async (request, response) => {
     if (forumAlreadyExist)
       return response.status(400).json({ message: "Forum name already exist" });
 
-    const forumName = request.body.forumName;
-    const userId = request.body.userId;
-    const userName = request.body.userName;
-    const theme = request.body.theme;
     // create a new forum object with the new forum name.
-    const newForum = new Forum({ forumName, userName, theme, userId });
+    const newForum = new Forum({
+      forumName: request.body.forumName,
+      theme: request.body.theme,
+      userId: request.body.userId,
+    });
     // use the new forum object to save the data in the database
     newForum
       .save()
@@ -47,19 +47,19 @@ exports.addNewForum = async (request, response) => {
 };
 
 // update a forum controller
-exports.updateForum = (request, response) => {
-  const userName = request.body.userName;
-  const theme = request.body.theme;
-  try {
-    Forum.findById(request.params.id)
-      .then((forum) => {
-        forum.userName = userName;
-        forum.theme = theme;
-        return forum.save();
-      })
-      .then((result) => {
-        response.json(result);
-      })
-      .catch((err) => response.status(400).json(err.message));
-  } catch (err) {}
-};
+// exports.updateForum = (request, response) => {
+//   const userName = request.body.userName;
+//   const theme = request.body.theme;
+//   try {
+//     Forum.findById(request.params.id)
+//       .then((forum) => {
+//         forum.userName = userName;
+//         forum.theme = theme;
+//         return forum.save();
+//       })
+//       .then((result) => {
+//         response.json(result);
+//       })
+//       .catch((err) => response.status(400).json(err.message));
+//   } catch (err) {}
+// };

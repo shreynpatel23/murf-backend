@@ -7,7 +7,6 @@ exports.getAllPosts = (_, response) => {
     Post.find()
       .populate("userId")
       .then((post) => {
-        console.log(post);
         response.json(post);
       })
       .catch((err) => response.status(400).json(err));

@@ -13,4 +13,7 @@ router.post("/new-forum", ForumController.addNewForum);
 // routes for update forum.
 // router.post("/:id/update-forum", ForumController.updateForum);
 
+// rputes for getting all post for forum
+router.get("/:id/posts", ForumController.getAllPostForForum);
+
 module.exports = router;

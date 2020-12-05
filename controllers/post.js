@@ -1,19 +1,5 @@
 const Post = require("../modals/post.modal");
 const Forum = require("../modals/forum.modal");
-// function to get all post of the forum
-exports.getAllPosts = (_, response) => {
-  try {
-    // the below function returns a promise.
-    Post.find()
-      .populate("userId")
-      .then((post) => {
-        response.json(post);
-      })
-      .catch((err) => response.status(400).json(err));
-  } catch (err) {
-    response.status(400).json(err);
-  }
-};
 
 // function for getting a particular post by ID
 exports.getPostById = (request, response) => {
@@ -41,7 +27,7 @@ exports.getAllPostsOfUser = async (request, response) => {
         response.send("no post found for this ID");
       })
       .catch((err) => response.status(400).json(err));
-    Post.findById(id);
+    // Post.findById(id);
   } catch (err) {
     response.status(400).json(err);
   }

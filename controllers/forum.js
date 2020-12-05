@@ -1,4 +1,5 @@
 const Forum = require("../modals/forum.modal");
+const Posts = require("../modals/post.modal");
 
 // Get all forum controller
 exports.getAllForums = (_, response) => {
@@ -64,3 +65,17 @@ exports.addNewForum = async (request, response) => {
 //       .catch((err) => response.status(400).json(err.message));
 //   } catch (err) {}
 // };
+
+// get all posts for forum
+exports.getAllPostForForum = (request, response) => {
+  const id = request.params.id;
+  try {
+    Posts.find({
+      forumId: id,
+    })
+      .then((posts) => response.json(posts))
+      .catch((err) => response.json(err));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};

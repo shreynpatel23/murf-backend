@@ -13,6 +13,7 @@ exports.getForumById = (request, response) => {
   try {
     const id = request.params.id;
     Forum.findById(id)
+      .populate("userId")
       .then((forum) => response.json(forum))
       .catch((err) => response.json(err));
   } catch (err) {

@@ -61,6 +61,8 @@ exports.addNewPost = async (request, response) => {
     const forumId = request.body.forumId;
     const headerText = request.body.headerText;
     const bodyText = request.body.bodyText;
+    const headerHTML = request.body.headerHTML;
+    const bodyHTML = request.body.bodyHTML;
     const tags = request.body.tags;
     const category = request.body.category.toLowerCase();
     const comments = request.body.comments;
@@ -70,7 +72,9 @@ exports.addNewPost = async (request, response) => {
     const newPost = new Post({
       forumId,
       headerText,
+      headerHTML,
       bodyText,
+      bodyHTML,
       tags,
       category,
       comments,
@@ -81,7 +85,9 @@ exports.addNewPost = async (request, response) => {
     });
     newPost
       .save()
-      .then((post) => response.json(post))
+      .then((post) => {
+        response.json(post);
+      })
       .catch((err) => response.status(400).json(err.message));
   } catch (err) {
     response.status(400).json(err);

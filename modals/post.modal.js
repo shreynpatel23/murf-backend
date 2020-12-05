@@ -20,7 +20,13 @@ const postSchema = new Schema(
     headerText: {
       type: String,
     },
+    headerHTML: {
+      type: String,
+    },
     bodyText: {
+      type: String,
+    },
+    bodyHTML: {
       type: String,
     },
     tags: {

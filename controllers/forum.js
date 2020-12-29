@@ -73,6 +73,7 @@ exports.getAllPostForForum = (request, response) => {
     Posts.find({
       forumId: id,
     })
+      .populate("userId")
       .then((posts) => response.json(posts))
       .catch((err) => response.json(err));
   } catch (err) {

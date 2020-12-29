@@ -79,3 +79,18 @@ exports.addNewPost = async (request, response) => {
     response.status(400).json(err);
   }
 };
+
+// function to update a post
+exports.updatePost = async (request, response) => {
+  try {
+    Post.findById(request.params.id)
+      .then((post) => {
+        response.json(post);
+        console.log(post);
+      })
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((err) => response.status(400).json(err.message));
+  } catch (err) {}
+};

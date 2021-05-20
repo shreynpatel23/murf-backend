@@ -44,6 +44,7 @@ exports.addNewForum = async (request, response) => {
       .save()
       .then((forum) => response.json(forum))
       .catch((err) => response.status(400).json(err.message));
+    // updating the user schema with forum id.
     User.findById(request.body.userId)
       .then((user) => {
         user.forumId = newForum._id;

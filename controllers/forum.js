@@ -1,5 +1,6 @@
 const Forum = require("../modals/forum.modal");
 const Posts = require("../modals/post.modal");
+const User = require("../modals/user.modal");
 
 // Get all forum controller
 exports.getAllForums = (_, response) => {
@@ -43,6 +44,12 @@ exports.addNewForum = async (request, response) => {
       .save()
       .then((forum) => response.json(forum))
       .catch((err) => response.status(400).json(err.message));
+    User.findById(request.body.userId)
+      .then((user) => {
+        user.forumId = newForum._id;
+        return user.save();
+      })
+      .catch((err) => response.status(400).json(err.message));
   } catch (err) {
     response.status(400).json(err);
   }
@@ -53,16 +60,16 @@ exports.addNewForum = async (request, response) => {
 //   const userName = request.body.userName;
 //   const theme = request.body.theme;
 //   try {
-//     Forum.findById(request.params.id)
-//       .then((forum) => {
-//         forum.userName = userName;
-//         forum.theme = theme;
-//         return forum.save();
-//       })
-//       .then((result) => {
-//         response.json(result);
-//       })
-//       .catch((err) => response.status(400).json(err.message));
+// Forum.findById(request.params.id)
+//   .then((forum) => {
+//     forum.userName = userName;
+//     forum.theme = theme;
+//     return forum.save();
+//   })
+//   .then((result) => {
+//     response.json(result);
+//   })
+//   .catch((err) => response.status(400).json(err.message));
 //   } catch (err) {}
 // };
 

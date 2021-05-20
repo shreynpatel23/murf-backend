@@ -18,9 +18,9 @@ const userSchema = new Schema(
     imageUrl: {
       type: String,
     },
-    userName: {
-      type: String,
-      required: true,
+    forumId: {
+      type: Schema.Types.ObjectId,
+      ref: "Forum",
     },
   },
   { timestamps: true }

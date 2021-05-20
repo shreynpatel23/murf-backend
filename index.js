@@ -38,4 +38,4 @@ app.use(express.json());
 
 app.use(AuthController);
 app.use("/forums", verify, ForumController);
-app.use("/posts", verify, PostController);
+app.use("/forums/:id/posts", verify, PostController);

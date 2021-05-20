@@ -35,7 +35,6 @@ exports.getAllPostsOfUser = async (request, response) => {
 
 // function for adding a new post
 exports.addNewPost = async (request, response) => {
-  console.log("inside add new post by id");
   try {
     // check if the forum exist or not.
     const forumAlreadyExist = await Forum.findOne({

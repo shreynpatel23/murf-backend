@@ -14,13 +14,11 @@
     "global": "^4.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.19",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "compression": "^1.7.4"
   },
   "scripts": {
     "start": "node index.js",
     "start:dev": "nodemon index.js"
-  },
-  "devDependencies": {
-    "compression": "^1.7.4"
   }
 }

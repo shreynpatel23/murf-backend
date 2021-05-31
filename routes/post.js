@@ -4,8 +4,8 @@ const postController = require("../controllers/post");
 // routes for getting all posts from a channel
 router.get("/", postController.getAllPostOfChannel);
 
-// routes for get forum by ID.
-// router.get("/:id", postController.getPostById);
+// routes for post by id.
+router.get("/:id", postController.getPostById);
 
 // routes for add a new Post.
 router.post("/create-post", postController.createNewPost);

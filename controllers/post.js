@@ -21,37 +21,16 @@ exports.getAllPostOfChannel = async (request, response) => {
 };
 
 // function for getting a particular post by ID
-// exports.getPostById = (request, response) => {
-//   try {
-//     const id = request.params.id;
-//     console.log(id);
-//     Post.findById(id)
-//       .then((post) => response.json(post))
-//       .catch((err) => response.json(err));
-//   } catch (err) {
-//     response.status(400).json(err);
-//   }
-// };
-
-// function for getting all posts of a user based upon userId
-// exports.getAllPostsOfUser = async (request, response) => {
-//   const id = request.body.userId;
-//   try {
-//     await Post.find({
-//       userId: id,
-//     })
-//       .then((post) => {
-//         if (post.length !== 0) {
-//           return response.json(post);
-//         }
-//         response.send("no post found for this ID");
-//       })
-//       .catch((err) => response.status(400).json(err));
-//     // Post.findById(id);
-//   } catch (err) {
-//     response.status(400).json(err);
-//   }
-// };
+exports.getPostById = (request, response) => {
+  try {
+    const id = request.params.id;
+    Post.findById(id)
+      .then((post) => response.json(post))
+      .catch((err) => response.json(err));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
 
 // function for adding a new post
 exports.createNewPost = async (request, response) => {

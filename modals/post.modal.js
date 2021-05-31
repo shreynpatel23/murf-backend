@@ -13,6 +13,11 @@ const postSchema = new Schema(
       ref: "User",
       required: true,
     },
+    channelId: {
+      type: Schema.Types.ObjectId,
+      ref: "Channel",
+      required: true,
+    },
     liked: {
       count: Number,
       isLiked: Boolean,
@@ -32,15 +37,8 @@ const postSchema = new Schema(
     tags: {
       type: Array,
     },
-    category: {
-      type: String,
-    },
     comments: {
       type: Array,
-    },
-    postedBy: {
-      type: String,
-      ref: "User",
     },
     pinned: {
       type: Boolean,

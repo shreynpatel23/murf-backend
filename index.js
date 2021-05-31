@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const compression = require("compression");
 const ForumController = require("./routes/forum");
 const PostController = require("./routes/post");
+const ChannelController = require("./routes/channel");
 const AuthController = require("./routes/auth");
 const verify = require("./routes/verifyRoutes");
 
@@ -41,4 +42,5 @@ app.use(express.json());
 
 app.use(AuthController);
 app.use("/forums", verify, ForumController);
-app.use("/forums/:id/posts", verify, PostController);
+app.use("/forums/:id/channels", verify, ChannelController);
+app.use("/forums/:id/channels/:id/posts", verify, PostController);

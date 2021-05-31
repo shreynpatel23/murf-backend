@@ -1,14 +1,7 @@
 const Forum = require("../modals/forum.modal");
-const Posts = require("../modals/post.modal");
+const Channel = require("../modals/channel.modal");
 const User = require("../modals/user.modal");
-
-// Get all forum controller
-exports.getAllForums = (_, response) => {
-  // the below function returns a promise.
-  Forum.find()
-    .then((forum) => response.json(forum))
-    .catch((err) => response.json(err));
-};
+const defaultChannels = ["General", "Announcements", "News"];
 
 // Get forum by id controller
 exports.getForumById = (request, response) => {
@@ -17,27 +10,35 @@ exports.getForumById = (request, response) => {
     Forum.findById(id)
       .populate("userId")
       .then((forum) => response.json(forum))
-      .catch((err) => response.json(err));
+      .catch(() => response.status(400).json({ message: "Forum not found" }));
   } catch (err) {
     response.status(400).json(err);
   }
 };
 
 // Add new forum controller
-exports.addNewForum = async (request, response) => {
+exports.createForum = async (request, response) => {
   try {
     // check if the forum already exist or not.
     const forumAlreadyExist = await Forum.findOne({
-      forumName: request.body.forumName,
+      forum_name: request.body.forum_name,
     });
     if (forumAlreadyExist)
       return response.status(400).json({ message: "Forum name already exist" });
 
+    // create default channels for the forum.
+    const default_channels = defaultChannels.map((channel_name) => {
+      return new Channel({
+        channel_name: channel_name,
+      });
+    });
+
     // create a new forum object with the new forum name.
     const newForum = new Forum({
-      forumName: request.body.forumName,
+      forum_name: request.body.forum_name,
       theme: request.body.theme,
       userId: request.body.userId,
+      channels: default_channels,
     });
     // use the new forum object to save the data in the database
     newForum
@@ -51,39 +52,6 @@ exports.addNewForum = async (request, response) => {
         return user.save();
       })
       .catch((err) => response.status(400).json(err.message));
-  } catch (err) {
-    response.status(400).json(err);
-  }
-};
-
-// update a forum controller
-// exports.updateForum = (request, response) => {
-//   const userName = request.body.userName;
-//   const theme = request.body.theme;
-//   try {
-// Forum.findById(request.params.id)
-//   .then((forum) => {
-//     forum.userName = userName;
-//     forum.theme = theme;
-//     return forum.save();
-//   })
-//   .then((result) => {
-//     response.json(result);
-//   })
-//   .catch((err) => response.status(400).json(err.message));
-//   } catch (err) {}
-// };
-
-// get all posts for forum
-exports.getAllPostForForum = (request, response) => {
-  const id = request.params.id;
-  try {
-    Posts.find({
-      forumId: id,
-    })
-      .populate("userId")
-      .then((posts) => response.json(posts))
-      .catch((err) => response.json(err));
   } catch (err) {
     response.status(400).json(err);
   }

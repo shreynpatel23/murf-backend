@@ -94,16 +94,20 @@ exports.createNewPost = async (request, response) => {
 };
 
 // function to update a post
-// exports.updatePost = async (request, response) => {
-//   try {
-//     Post.findById(request.params.id)
-//       .then((post) => {
-//         response.json(post);
-//         console.log(post);
-//       })
-//       .then((result) => {
-//         response.json(result);
-//       })
-//       .catch((err) => response.status(400).json(err.message));
-//   } catch (err) {}
-// };
+exports.updatePost = async (request, response) => {
+  try {
+    Post.findById(request.params.id)
+      .then((post) => {
+        const { headerText, bodyText, tags } = request.body;
+        post.headerText = headerText;
+        post.bodyText = bodyText;
+        post.tags = tags;
+        post.save();
+        response.json(post);
+      })
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((err) => response.status(400).json(err.message));
+  } catch (err) {}
+};

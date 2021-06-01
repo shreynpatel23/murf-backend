@@ -11,6 +11,6 @@ router.get("/:id", postController.getPostById);
 router.post("/create-post", postController.createNewPost);
 
 // routes for updating a post.
-// router.put("/:id/update-post", postController.updatePost);
+router.put("/:id/update-post", postController.updatePost);
 
 module.exports = router;

@@ -2,8 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
+const compression = require("compression");
 const ForumController = require("./routes/forum");
 const PostController = require("./routes/post");
+const ChannelController = require("./routes/channel");
 const AuthController = require("./routes/auth");
 const verify = require("./routes/verifyRoutes");
 
@@ -14,6 +16,8 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 // use this variable to connect to the database
 const db_url = process.env.ATLAS_URI;
+
+app.use(compression());
 
 // establishing the connection
 mongoose
@@ -38,4 +42,5 @@ app.use(express.json());
 
 app.use(AuthController);
 app.use("/forums", verify, ForumController);
-app.use("/forums/:id/posts", verify, PostController);
+app.use("/forums/:id/channels", verify, ChannelController);
+app.use("/forums/:id/channels/:id/posts", verify, PostController);

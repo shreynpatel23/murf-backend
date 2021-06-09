@@ -3,13 +3,16 @@ const Schema = mongoose.Schema;
 
 const forumSchema = new Schema(
   {
-    forumName: {
+    forum_name: {
       type: String,
       required: true,
     },
     theme: {
       type: String,
       required: true,
+    },
+    channels: {
+      type: Array,
     },
     userId: {
       type: Schema.Types.ObjectId,

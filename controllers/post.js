@@ -1,5 +1,24 @@
 const Post = require("../modals/post.modal");
 const Forum = require("../modals/forum.modal");
+const Channel = require("../modals/channel.modal");
+
+// function for getting all post of a channel
+exports.getAllPostOfChannel = async (request, response) => {
+  try {
+    const forumId = request.baseUrl.split("/")[2];
+    const channelId = request.baseUrl.split("/")[4];
+    Forum.findById(forumId)
+      .then((forum) => {
+        const channel = forum.channels.find((channel) => {
+          return channel._id == channelId;
+        });
+        response.json(channel.posts);
+      })
+      .catch(() => response.status(400).json({ message: "channel not found" }));
+  } catch (err) {
+    response.status(400).json(err.message);
+  }
+};
 
 // function for getting a particular post by ID
 exports.getPostById = (request, response) => {
@@ -13,68 +32,62 @@ exports.getPostById = (request, response) => {
   }
 };
 
-// function for getting all posts of a user based upon userId
-exports.getAllPostsOfUser = async (request, response) => {
-  const id = request.body.userId;
-  try {
-    await Post.find({
-      userId: id,
-    })
-      .then((post) => {
-        if (post.length !== 0) {
-          return response.json(post);
-        }
-        response.send("no post found for this ID");
-      })
-      .catch((err) => response.status(400).json(err));
-    // Post.findById(id);
-  } catch (err) {
-    response.status(400).json(err);
-  }
-};
-
 // function for adding a new post
-exports.addNewPost = async (request, response) => {
+exports.createNewPost = async (request, response) => {
   try {
+    const forumId = request.baseUrl.split("/")[2];
+    const channelId = request.baseUrl.split("/")[4];
     // check if the forum exist or not.
-    const forumAlreadyExist = await Forum.findOne({
-      _id: request.body.forumId,
-    });
+    const forumAlreadyExist = await Forum.findById(forumId);
+
     if (!forumAlreadyExist)
       return response.status(400).json({ message: "Forum Does not exist" });
 
-    const userId = request.body.userId;
-    const forumId = request.body.forumId;
-    const headerText = request.body.headerText;
-    const bodyText = request.body.bodyText;
-    const headerHTML = request.body.headerHTML;
-    const bodyHTML = request.body.bodyHTML;
-    const tags = request.body.tags;
-    const category = request.body.category.toLowerCase();
-    const comments = request.body.comments;
-    const pinned = request.body.pinned;
-    const liked = request.body.liked;
-    const saved = request.body.saved;
-    const newPost = new Post({
-      forumId,
-      headerText,
-      headerHTML,
-      bodyText,
-      bodyHTML,
-      tags,
-      category,
-      comments,
-      pinned,
-      saved,
-      liked,
-      userId,
-    });
-    newPost
-      .save()
-      .then((post) => {
-        response.json(post);
+    Forum.findById(forumId)
+      .then((forum) => {
+        const {
+          userId,
+          headerText,
+          bodyText,
+          headerHTML,
+          bodyHTML,
+          tags,
+          comments,
+          pinned,
+          liked,
+          saved,
+        } = request.body;
+        const newPost = new Post({
+          forumId,
+          headerText,
+          headerHTML,
+          bodyText,
+          bodyHTML,
+          tags,
+          comments,
+          pinned,
+          saved,
+          liked,
+          userId,
+          channelId,
+        });
+        newPost
+          .save()
+          .then((post) => {
+            response.json(post);
+            const updatedChannels = forum.channels.map((channel) => {
+              if (channel._id == channelId) {
+                const posts = channel.posts;
+                return { ...channel, posts: [...posts, post] };
+              }
+              return channel;
+            });
+            forum.channels = updatedChannels;
+            forum.save();
+          })
+          .catch((err) => response.status(400).json(err.message));
       })
-      .catch((err) => response.status(400).json(err.message));
+      .catch(() => response.status(400).json({ message: "channel not found" }));
   } catch (err) {
     response.status(400).json(err);
   }
@@ -85,8 +98,12 @@ exports.updatePost = async (request, response) => {
   try {
     Post.findById(request.params.id)
       .then((post) => {
+        const { headerText, bodyText, tags } = request.body;
+        post.headerText = headerText;
+        post.bodyText = bodyText;
+        post.tags = tags;
+        post.save();
         response.json(post);
-        console.log(post);
       })
       .then((result) => {
         response.json(result);

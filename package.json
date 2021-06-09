@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "engines": {
+    "node": "14.17.0"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -11,9 +14,11 @@
     "global": "^4.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.19",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "compression": "^1.7.4"
   },
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "start:dev": "nodemon index.js"
   }
 }

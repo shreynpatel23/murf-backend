@@ -5,15 +5,9 @@ const Channel = require("../modals/channel.modal");
 // function for getting all post of a channel
 exports.getAllPostOfChannel = async (request, response) => {
   try {
-    const forumId = request.baseUrl.split("/")[2];
     const channelId = request.baseUrl.split("/")[4];
-    Forum.findById(forumId)
-      .then((forum) => {
-        const channel = forum.channels.find((channel) => {
-          return channel._id == channelId;
-        });
-        response.json(channel.posts);
-      })
+    Post.find({ channelId: channelId })
+      .then((channel) => response.json(channel))
       .catch(() => response.status(400).json({ message: "channel not found" }));
   } catch (err) {
     response.status(400).json(err.message);
@@ -75,10 +69,15 @@ exports.createNewPost = async (request, response) => {
           .save()
           .then((post) => {
             response.json(post);
+            Channel.findById(channelId).then((channel) => {
+              const postIds = channel.postIds;
+              channel.postIds = [...postIds, post._id];
+              channel.save();
+            });
             const updatedChannels = forum.channels.map((channel) => {
               if (channel._id == channelId) {
-                const posts = channel.posts;
-                return { ...channel, posts: [...posts, post] };
+                const postIds = channel.postIds;
+                return { ...channel, postIds: [...postIds, post._id] };
               }
               return channel;
             });

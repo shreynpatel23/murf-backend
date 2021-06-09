@@ -11,7 +11,7 @@ const channelSchema = new Schema({
     ref: "Forum",
     required: true,
   },
-  posts: {
+  postIds: {
     type: Array,
   },
 });

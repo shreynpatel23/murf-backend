@@ -4,19 +4,25 @@ const Channel = require("../modals/channel.modal");
 // Add new channel for a forum
 exports.createCustomChannel = async (request, response) => {
   try {
-    const newCustomChannel = new Channel({
+    const channels = [];
+    new Channel({
       channel_name: request.body.channel_name,
-    });
-    console.log(request.body.forumId);
+      forumId: request.body.forumId,
+    })
+      .save()
+      .then((channel) => channels.push(channel))
+      .catch(() =>
+        response.status(400).json({ message: "Error in creating a channel" })
+      );
     Forum.findById(request.body.forumId)
       .then((forum) => {
         if (forum.channels.length >= 10) {
           return response
             .status(400)
-            .json("Only 5 custom channels are allowed in a forum");
+            .json("Only 10 channels are allowed in a forum");
         }
-        const channels = forum.channels;
-        forum.channels = [...channels, newCustomChannel];
+        const forum_channels = forum.channels;
+        forum.channels = [...forum_channels, channels];
         forum.save().then((forum) => response.json(forum.channels));
       })
       .catch(() =>

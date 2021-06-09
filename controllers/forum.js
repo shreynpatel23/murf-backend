@@ -8,7 +8,7 @@ exports.getForumById = (request, response) => {
   try {
     const id = request.params.id;
     Forum.findById(id)
-      .populate("userId")
+      .populate({ path: "userId", select: ["imageUrl", "email", "name"] })
       .then((forum) => response.json(forum))
       .catch(() => response.status(400).json({ message: "Forum not found" }));
   } catch (err) {
@@ -26,24 +26,37 @@ exports.createForum = async (request, response) => {
     if (forumAlreadyExist)
       return response.status(400).json({ message: "Forum name already exist" });
 
-    // create default channels for the forum.
-    const default_channels = defaultChannels.map((channel_name) => {
-      return new Channel({
-        channel_name: channel_name,
-      });
-    });
-
     // create a new forum object with the new forum name.
     const newForum = new Forum({
       forum_name: request.body.forum_name,
       theme: request.body.theme,
       userId: request.body.userId,
-      channels: default_channels,
     });
     // use the new forum object to save the data in the database
     newForum
       .save()
-      .then((forum) => response.json(forum))
+      .then(async (forum) => {
+        const channels = [];
+        // create default channels for the forum.
+        await Promise.all(
+          defaultChannels.map(async (channel_name) => {
+            await new Channel({
+              channel_name: channel_name,
+              forumId: forum._id,
+            })
+              .save()
+              .then((channel) => channels.push(channel))
+              .catch(() =>
+                response
+                  .status(400)
+                  .json({ message: "Error in creating channels" })
+              );
+          })
+        );
+        forum.channels = channels;
+        forum.save();
+        response.json(forum);
+      })
       .catch((err) => response.status(400).json(err.message));
     // updating the user schema with forum id.
     User.findById(request.body.userId)

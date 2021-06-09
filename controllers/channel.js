@@ -5,7 +5,7 @@ const Channel = require("../modals/channel.modal");
 exports.createCustomChannel = async (request, response) => {
   try {
     const channels = [];
-    new Channel({
+    await new Channel({
       channel_name: request.body.channel_name,
       forumId: request.body.forumId,
     })
@@ -14,15 +14,14 @@ exports.createCustomChannel = async (request, response) => {
       .catch(() =>
         response.status(400).json({ message: "Error in creating a channel" })
       );
-    Forum.findById(request.body.forumId)
+    await Forum.findById(request.body.forumId)
       .then((forum) => {
         if (forum.channels.length >= 10) {
           return response
             .status(400)
             .json("Only 10 channels are allowed in a forum");
         }
-        const forum_channels = forum.channels;
-        forum.channels = [...forum_channels, channels];
+        forum.channels = [...forum.channels, ...channels];
         forum.save().then((forum) => response.json(forum.channels));
       })
       .catch(() =>

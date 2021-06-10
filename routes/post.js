@@ -13,4 +13,7 @@ router.post("/create-post", postController.createNewPost);
 // routes for updating a post.
 router.put("/:id/update-post", postController.updatePost);
 
+// routes for liking a post.
+router.put("/:id/like", postController.likePost);
+
 module.exports = router;

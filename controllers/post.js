@@ -104,9 +104,32 @@ exports.updatePost = async (request, response) => {
         post.save();
         response.json(post);
       })
-      .then((result) => {
-        response.json(result);
+      .catch((err) => response.status(400).json(err.message));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
+// function to like a post
+exports.likePost = async (request, response) => {
+  try {
+    Post.findById(request.params.id)
+      .then((post) => {
+        const { isLiked } = request.body;
+        let count = post.liked.count;
+        if (isLiked && !post.liked.isLiked) {
+          post.liked = { ...post.liked, isLiked: isLiked, count: count + 1 };
+          response.json(post.liked);
+        } else if (!isLiked && post.liked.isLiked) {
+          post.liked = { ...post.liked, isLiked: isLiked, count: count - 1 };
+          response.json(post.liked);
+        } else {
+          response.status(400).json({ message: "Something went wrong" });
+        }
+        post.save();
       })
       .catch((err) => response.status(400).json(err.message));
-  } catch (err) {}
+  } catch (err) {
+    response.status(400).json(err);
+  }
 };

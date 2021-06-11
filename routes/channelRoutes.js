@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const channelController = require("../controllers/channel");
+const channelController = require("../controllers/channelController");
 
 // routes for getting all posts from a channel
 router.get("/:id/posts", channelController.getAllPostOfChannel);

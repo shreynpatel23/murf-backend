@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const postController = require("../controllers/post");
+const postController = require("../controllers/postController");
 
 // routes for post by id.
 router.get("/:id", postController.getPostById);

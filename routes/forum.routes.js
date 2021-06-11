@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const ForumController = require("../controllers/forum");
+const ForumController = require("../controllers/forumController");
 
 // routes for get forum by ID.
 router.get("/:id", ForumController.getForumById);

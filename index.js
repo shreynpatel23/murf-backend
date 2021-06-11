@@ -6,6 +6,7 @@ const compression = require("compression");
 const ForumController = require("./routes/forum");
 const PostController = require("./routes/post");
 const ChannelController = require("./routes/channel");
+const CommentController = require("./routes/comment");
 const AuthController = require("./routes/auth");
 const verify = require("./routes/verifyRoutes");
 
@@ -42,5 +43,6 @@ app.use(express.json());
 
 app.use(AuthController);
 app.use("/forums", verify, ForumController);
-app.use("/forums/:id/channels", verify, ChannelController);
-app.use("/forums/:id/channels/:id/posts", verify, PostController);
+app.use("/channels", verify, ChannelController);
+app.use("/posts", verify, PostController);
+app.use("/comments", verify, CommentController);

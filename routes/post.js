@@ -16,4 +16,7 @@ router.put("/:id/update-post", postController.updatePost);
 // routes for liking a post.
 router.put("/:id/like", postController.likePost);
 
+// routes for adding comment.
+router.post("/:id/add-comment", postController.addComment);
+
 module.exports = router;

@@ -1,6 +1,7 @@
 const Post = require("../modals/post.modal");
 const Forum = require("../modals/forum.modal");
 const Channel = require("../modals/channel.modal");
+const Comment = require("../modals/comment.modal");
 
 // function for getting all post of a channel
 exports.getAllPostOfChannel = async (request, response) => {
@@ -129,6 +130,34 @@ exports.likePost = async (request, response) => {
         post.save();
       })
       .catch((err) => response.status(400).json(err.message));
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
+// function to add a comment
+exports.addComment = async (request, response) => {
+  try {
+    const postId = request.params.id;
+    const { comment } = request.body;
+    Post.findById(postId)
+      .then(async (post) => {
+        const new_comment = await new Comment({
+          comment: comment,
+          postId: post._id,
+          replies: [],
+        })
+          .save()
+          .then((comment) => {
+            response.json(comment);
+            post.comments = [...post.comments, comment._id];
+            post.save();
+          })
+          .catch(() =>
+            response.status(400).json({ message: "Cannot post your comment" })
+          );
+      })
+      .catch((err) => response.status(400).json(err));
   } catch (err) {
     response.status(400).json(err);
   }

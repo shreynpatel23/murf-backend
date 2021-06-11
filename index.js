@@ -3,11 +3,11 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 const compression = require("compression");
-const ForumController = require("./routes/forum");
-const PostController = require("./routes/post");
-const ChannelController = require("./routes/channel");
-const CommentController = require("./routes/comment");
-const AuthController = require("./routes/auth");
+const ForumController = require("./routes/forumRoutes");
+const PostController = require("./routes/postRoutes");
+const ChannelController = require("./routes/channelRoutes");
+const CommentController = require("./routes/commentRoutes");
+const AuthController = require("./routes/authRoutes");
 const verify = require("./routes/verifyRoutes");
 
 // use this command to configure the dotenv file.

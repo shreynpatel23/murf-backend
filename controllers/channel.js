@@ -1,5 +1,18 @@
 const Forum = require("../modals/forum.modal");
 const Channel = require("../modals/channel.modal");
+const Post = require("../modals/post.modal");
+
+// function for getting all post of a channel
+exports.getAllPostOfChannel = async (request, response) => {
+  try {
+    const { id } = request.params;
+    Post.find({ channelId: id })
+      .then((channel) => response.json(channel))
+      .catch(() => response.status(400).json({ message: "channel not found" }));
+  } catch (err) {
+    response.status(400).json(err.message);
+  }
+};
 
 // Add new channel for a forum
 exports.createCustomChannel = async (request, response) => {

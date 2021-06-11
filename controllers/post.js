@@ -3,18 +3,6 @@ const Forum = require("../modals/forum.modal");
 const Channel = require("../modals/channel.modal");
 const Comment = require("../modals/comment.modal");
 
-// function for getting all post of a channel
-exports.getAllPostOfChannel = async (request, response) => {
-  try {
-    const channelId = request.baseUrl.split("/")[4];
-    Post.find({ channelId: channelId })
-      .then((channel) => response.json(channel))
-      .catch(() => response.status(400).json({ message: "channel not found" }));
-  } catch (err) {
-    response.status(400).json(err.message);
-  }
-};
-
 // function for getting a particular post by ID
 exports.getPostById = (request, response) => {
   try {
@@ -30,8 +18,7 @@ exports.getPostById = (request, response) => {
 // function for adding a new post
 exports.createNewPost = async (request, response) => {
   try {
-    const forumId = request.baseUrl.split("/")[2];
-    const channelId = request.baseUrl.split("/")[4];
+    const { forumId, channelId } = request.body;
     // check if the forum exist or not.
     const forumAlreadyExist = await Forum.findById(forumId);
 
@@ -135,29 +122,13 @@ exports.likePost = async (request, response) => {
   }
 };
 
-// function to add a comment
-exports.addComment = async (request, response) => {
+// funtion to get all comments of the post
+exports.getAllComments = async (request, response) => {
   try {
-    const postId = request.params.id;
-    const { comment } = request.body;
-    Post.findById(postId)
-      .then(async (post) => {
-        const new_comment = await new Comment({
-          comment: comment,
-          postId: post._id,
-          replies: [],
-        })
-          .save()
-          .then((comment) => {
-            response.json(comment);
-            post.comments = [...post.comments, comment._id];
-            post.save();
-          })
-          .catch(() =>
-            response.status(400).json({ message: "Cannot post your comment" })
-          );
-      })
-      .catch((err) => response.status(400).json(err));
+    const { id } = request.params;
+    Comment.find({ postId: id })
+      .then((comments) => response.json(comments))
+      .catch(() => response.status(400).json({ message: "Post not found" }));
   } catch (err) {
     response.status(400).json(err);
   }

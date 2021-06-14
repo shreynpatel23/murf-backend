@@ -1,5 +1,6 @@
-let User = require("../modals/user.modal");
+const User = require("../modals/user.modal");
 const jwt = require("jsonwebtoken");
+const mail = require("../utils/mail.helper");
 
 exports.register = async (request, response) => {
   // check whether email is present in our database or not.
@@ -20,6 +21,16 @@ exports.register = async (request, response) => {
       .save()
       .then((res) => {
         response.header("authToken", token);
+        const dynamic_template_date = {
+          subject: "Welcome onboard",
+          name: request.body.name,
+          redirect_url: "https://google.com",
+        };
+        mail.sendMail(
+          res.email,
+          dynamic_template_date,
+          "d-91a72e6f5c794a2c9dab316701a250ac"
+        );
         response.json({
           error: "",
           data: {

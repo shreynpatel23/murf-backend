@@ -122,7 +122,7 @@ exports.likePost = async (request, response) => {
   }
 };
 
-// funtion to get all comments of the post
+// function to get all comments of the post
 exports.getAllComments = async (request, response) => {
   try {
     const { id } = request.params;

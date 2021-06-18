@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
+    forumId: {
+      type: Schema.Types.ObjectId,
+      ref: "Forum",
+    },
     name: {
       type: String,
       required: true,
@@ -15,12 +19,15 @@ const userSchema = new Schema(
       min: 6,
       max: 200,
     },
+    password: {
+      type: String,
+      required: true,
+    },
     imageUrl: {
       type: String,
     },
-    forumId: {
-      type: Schema.Types.ObjectId,
-      ref: "Forum",
+    isEmailVerified: {
+      type: Boolean,
     },
   },
   { timestamps: true }

@@ -67,9 +67,16 @@ exports.signInUsingGoogle = async (request, response) => {
       .save()
       .then((res) => {
         response.header("authToken", token);
-        const { _id, name, email, imageUrl } = res;
+        const { _id, name, email, imageUrl, isEmailVerified } = res;
         response.json(
-          getSuccessResponse({ name, email, imageUrl, _id, token })
+          getSuccessResponse({
+            name,
+            email,
+            imageUrl,
+            _id,
+            token,
+            isEmailVerified,
+          })
         );
       })
       .catch((err) => {

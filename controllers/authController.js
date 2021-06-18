@@ -1,51 +1,232 @@
 const User = require("../modals/user.modal");
 const jwt = require("jsonwebtoken");
 const mail = require("../utils/mail.helper");
+const bcrypt = require("bcryptjs");
+const { getSuccessResponse } = require("../utils/successResponse");
+const { getErrorResponse } = require("../utils/errorResponse");
 
-exports.register = async (request, response) => {
-  // check whether email is present in our database or not.
+function getFullHostURL(req) {
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
+  const host = req.get("host");
+  return `${protocol}://${host}`;
+}
+
+// function to generate email verification url
+function generateEmailValidationUrl(req, id) {
+  const url = getFullHostURL(req);
+  const current_date = new Date();
+  const expiry_time = current_date.getTime() + 30 * 60 * 1000; // 30 minutes
+  const email_token = jwt.sign(
+    { id: id, expires: expiry_time },
+    process.env.TOKEN_SECRET
+  );
+  return `${url}/verify/${email_token}`;
+}
+
+// function to Sign in using google
+exports.signInUsingGoogle = async (request, response) => {
+  const { user_name, user_email, imageUrl } = request.body;
   const token = jwt.sign({ id: request.body._id }, process.env.TOKEN_SECRET);
-  const user = await User.findOne({ email: request.body.email });
+  // check if the user already exists
+  const user = await User.findOne({ email: user_email });
+  let hashedPassword;
   if (user)
-    return response.status(200).send({
-      error: "email already exist",
-      data: { ...user._doc, token: token },
-    });
+    return response
+      .status(200)
+      .send(getErrorResponse("Email already exists! Try login instead"));
   try {
+    // create new random password
+    const randomPassword = Math.random().toString(36).substr(2, 8);
+    // Send password via email to the user
+    // create Dynamic data for the email
+    const dynamic_template_date = {
+      subject: "Your Default password",
+      name: user_name,
+      password: randomPassword,
+    };
+    // send email
+    mail.sendMail(
+      user_email,
+      dynamic_template_date,
+      "d-c8bcca7b513148529e75967a5e00f3ab"
+    );
+    // hash the password
+    await bcrypt
+      .hash(randomPassword, 12)
+      .then((password) => (hashedPassword = password));
+
+    // create the new user and save in DB
     const newUser = new User({
-      name: request.body.name,
-      email: request.body.email,
-      imageUrl: request.body.imageUrl,
+      name: user_name,
+      email: user_email,
+      password: hashedPassword,
+      isEmailVerified: true,
+      imageUrl: imageUrl,
     });
     newUser
       .save()
       .then((res) => {
         response.header("authToken", token);
-        const dynamic_template_date = {
-          subject: "Welcome onboard",
-          name: request.body.name,
-          redirect_url: "https://google.com",
-        };
-        mail.sendMail(
-          res.email,
-          dynamic_template_date,
-          "d-91a72e6f5c794a2c9dab316701a250ac"
+        const { _id, name, email, imageUrl } = res;
+        response.json(
+          getSuccessResponse({ name, email, imageUrl, _id, token })
         );
-        response.json({
-          error: "",
-          data: {
-            _id: res._id,
-            token: token,
-            name: res.name,
-            email: res.email,
-            imageUrl: res.imageUrl,
-          },
-        });
       })
       .catch((err) => {
-        response.status(400).json(err.message);
+        response.status(400).json(getErrorResponse(err.message));
       });
   } catch (err) {
-    response.status(400).json("please provide valid data point");
+    response
+      .status(400)
+      .json(getErrorResponse("please provide valid data point"));
+  }
+};
+
+// function to login with google
+exports.loginUsingGoogle = async (request, response) => {
+  const { user_email } = request.body;
+  const user = await User.findOne({ email: user_email });
+  if (!user)
+    return response.status(400).json(getErrorResponse("No user found"));
+  try {
+    const token = jwt.sign({ id: request.body._id }, process.env.TOKEN_SECRET);
+    const { name, email, imageUrl, _id, isEmailVerified } = user._doc;
+    return response.send(
+      getSuccessResponse({
+        name,
+        email,
+        imageUrl,
+        _id,
+        token,
+        isEmailVerified,
+      })
+    );
+  } catch (err) {
+    response.status(400).json(getErrorResponse(err.message));
+  }
+};
+
+// function to check the login Functionality
+exports.getUser = async (request, response) => {
+  const { user_email, password } = request.body;
+  const user = await User.findOne({ email: user_email });
+
+  // check if email is present or not
+  if (!user)
+    return response.status(400).json(getErrorResponse("No user found"));
+
+  // check if the password hash matches or not
+  if (!bcrypt.compareSync(password, user.password))
+    return response
+      .status(400)
+      .json(getErrorResponse("Email or password is incorrect!"));
+
+  try {
+    const token = jwt.sign({ id: request.body._id }, process.env.TOKEN_SECRET);
+    const { name, email, imageUrl, _id, isEmailVerified } = user._doc;
+    return response.status(200).send(
+      getSuccessResponse({
+        name,
+        email,
+        imageUrl,
+        _id,
+        token,
+        isEmailVerified,
+      })
+    );
+  } catch (err) {
+    response.status(400).json(getErrorResponse(err.message));
+  }
+};
+
+// Function for sign up a user
+exports.createUser = async (request, response) => {
+  const { user_name, user_email, password } = request.body;
+
+  // check if the user is present or not
+  const user = await User.findOne({ email: user_email });
+  if (user)
+    return response
+      .status(400)
+      .send(getErrorResponse("Email already exists! Try login instead"));
+
+  try {
+    let hashedPassword;
+    // hash the password here
+    await bcrypt
+      .hash(password, 12)
+      .then((password) => (hashedPassword = password))
+      .catch((err) => console.log(err));
+
+    // Create a new user and save in the DB
+    const newUser = new User({
+      name: user_name,
+      email: user_email,
+      password: hashedPassword,
+      isEmailVerified: false,
+      imageUrl: "",
+    });
+    newUser
+      .save()
+      .then(async (res) => {
+        const token = jwt.sign({ id: res._id }, process.env.TOKEN_SECRET);
+        const { _id, name, email, imageUrl, isEmailVerified } = res;
+        response.header("authToken", token);
+        const data = generateEmailValidationUrl(request, _id);
+        // create Dynamic data for the email
+        const dynamic_template_date = {
+          subject: "Welcome onboard",
+          name: name,
+          redirect_url: data,
+        };
+        // send email
+        mail.sendMail(
+          email,
+          dynamic_template_date,
+          "d-7477f4e6aaa4487aaf575433da69bf61"
+        );
+        response.json(
+          getSuccessResponse({
+            name,
+            email,
+            imageUrl,
+            _id,
+            token,
+            isEmailVerified,
+          })
+        );
+      })
+      .catch((err) => {
+        response.status(400).json(getErrorResponse(err.message));
+      });
+  } catch (err) {
+    response
+      .status(400)
+      .json(getErrorResponse("please provide valid data point"));
+  }
+};
+
+// function to verify the email of the customer
+exports.verifyUserEmail = async (request, response) => {
+  try {
+    const { token } = request.params;
+    const { id, expires } = jwt.verify(token, process.env.TOKEN_SECRET);
+    // Check whether expiry time is less than current time
+    // if less than we will show that Link is expired
+    const current_date = new Date();
+    if (expires < current_date.getTime())
+      return response.redirect(
+        `http://localhost:4000/email-verification-failed?err=Link Expired!&status=400&data=null`
+      );
+    // else will verify the users email.
+    await User.findOne({ _id: id })
+      .then((user) => {
+        user.isEmailVerified = true;
+        response.redirect("http://localhost:4000/auth");
+        user.save();
+      })
+      .catch((err) => getErrorResponse(err.message));
+  } catch (err) {
+    response.status(400).json(getErrorResponse(err.message));
   }
 };

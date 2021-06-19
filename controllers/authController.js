@@ -32,7 +32,7 @@ exports.signInUsingGoogle = async (request, response) => {
   let hashedPassword;
   if (user)
     return response
-      .status(200)
+      .status(400)
       .send(getErrorResponse("Email already exists! Try login instead"));
   try {
     // create new random password
@@ -97,7 +97,7 @@ exports.loginUsingGoogle = async (request, response) => {
     return response.status(400).json(getErrorResponse("No user found"));
   try {
     const token = jwt.sign({ id: request.body._id }, process.env.TOKEN_SECRET);
-    const { name, email, imageUrl, _id, isEmailVerified } = user._doc;
+    const { name, email, imageUrl, _id, isEmailVerified, forumId } = user._doc;
     return response.send(
       getSuccessResponse({
         name,
@@ -106,6 +106,7 @@ exports.loginUsingGoogle = async (request, response) => {
         _id,
         token,
         isEmailVerified,
+        forumId,
       })
     );
   } catch (err) {
@@ -130,7 +131,7 @@ exports.getUser = async (request, response) => {
 
   try {
     const token = jwt.sign({ id: request.body._id }, process.env.TOKEN_SECRET);
-    const { name, email, imageUrl, _id, isEmailVerified } = user._doc;
+    const { name, email, imageUrl, _id, isEmailVerified, forumId } = user._doc;
     return response.status(200).send(
       getSuccessResponse({
         name,
@@ -139,6 +140,7 @@ exports.getUser = async (request, response) => {
         _id,
         token,
         isEmailVerified,
+        forumId,
       })
     );
   } catch (err) {
@@ -223,13 +225,15 @@ exports.verifyUserEmail = async (request, response) => {
     const current_date = new Date();
     if (expires < current_date.getTime())
       return response.redirect(
-        `http://localhost:4000/email-verification-failed?err=Link Expired!&status=400&data=null`
+        "http://localhost:4000/email-verification-failed?err=Link Expired!&status=400&data=null"
       );
     // else will verify the users email.
     await User.findOne({ _id: id })
       .then((user) => {
         user.isEmailVerified = true;
-        response.redirect("http://localhost:4000/auth");
+        response.redirect(
+          "http://localhost:4000/login?err=null&status=200&data=Email Verified!"
+        );
         user.save();
       })
       .catch((err) => getErrorResponse(err.message));

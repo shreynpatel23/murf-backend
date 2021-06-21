@@ -184,7 +184,7 @@ exports.createUser = async (request, response) => {
         const data = generateEmailValidationUrl(request, _id);
         // create Dynamic data for the email
         const dynamic_template_date = {
-          subject: "Welcome onboard",
+          subject: "Email Verification",
           name: name,
           redirect_url: data,
         };
@@ -215,6 +215,47 @@ exports.createUser = async (request, response) => {
   }
 };
 
+// function to resend verification link to user
+exports.resendVerificationLink = async (request, response) => {
+  const { user_email } = request.body;
+  // getting the user who requested the verification link
+  const user = User.findOne({ email: user_email });
+
+  // check whether the user exist or not
+  if (!user)
+    return response.status(400).json(getErrorResponse("No user found"));
+
+  try {
+    user
+      .then((user) => {
+        // check if the user is already verified
+        if (user.isEmailVerified)
+          return response
+            .status(400)
+            .json(getErrorResponse("user is already verified"));
+        // generating the url
+        const data = generateEmailValidationUrl(request, user._id);
+        // create Dynamic data for the email
+        const dynamic_template_date = {
+          subject: "Email Verification",
+          name: user.name,
+          redirect_url: data,
+        };
+        // sending mail
+        mail.sendMail(
+          user.email,
+          dynamic_template_date,
+          "d-7477f4e6aaa4487aaf575433da69bf61"
+        );
+        // sending response
+        return response.status(200).json(getSuccessResponse("Email sent"));
+      })
+      .catch((err) => response.status(400).json(getErrorResponse(err.message)));
+  } catch (err) {
+    return response.status(400).json(getErrorResponse(err.message));
+  }
+};
+
 // function to verify the email of the customer
 exports.verifyUserEmail = async (request, response) => {
   try {
@@ -225,7 +266,7 @@ exports.verifyUserEmail = async (request, response) => {
     const current_date = new Date();
     if (expires < current_date.getTime())
       return response.redirect(
-        "http://localhost:4000/email-verification-failed?err=Link Expired!&status=400&data=null"
+        "http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null"
       );
     // else will verify the users email.
     await User.findOne({ _id: id })

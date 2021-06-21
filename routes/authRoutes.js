@@ -9,6 +9,8 @@ router.post("/sign-in-using-google", AuthController.signInUsingGoogle);
 
 router.post("/login-using-google", AuthController.loginUsingGoogle);
 
+router.post("/resend-verification-link", AuthController.resendVerificationLink);
+
 router.get("/verify/:token", AuthController.verifyUserEmail);
 
 module.exports = router;

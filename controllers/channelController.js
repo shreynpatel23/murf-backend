@@ -7,6 +7,7 @@ exports.getAllPostOfChannel = async (request, response) => {
   try {
     const { id } = request.params;
     Post.find({ channelId: id })
+      .populate({ path: "userId", select: ["imageUrl", "name"] })
       .then((channel) => response.json(channel))
       .catch(() => response.status(400).json({ message: "channel not found" }));
   } catch (err) {

@@ -8,6 +8,7 @@ exports.getPostById = (request, response) => {
   try {
     const id = request.params.id;
     Post.findById(id)
+      .populate({ path: "userId", select: ["imageUrl", "name"] })
       .then((post) => response.json(post))
       .catch((err) => response.json(err));
   } catch (err) {

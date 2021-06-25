@@ -2,6 +2,8 @@ const Post = require("../modals/post.modal");
 const Forum = require("../modals/forum.modal");
 const Channel = require("../modals/channel.modal");
 const Comment = require("../modals/comment.modal");
+const { getErrorResponse } = require("../utils/errorResponse");
+const { getSuccessResponse } = require("../utils/successResponse");
 
 // function for getting a particular post by ID
 exports.getPostById = (request, response) => {
@@ -86,14 +88,55 @@ exports.updatePost = async (request, response) => {
   try {
     Post.findById(request.params.id)
       .then((post) => {
-        const { headerText, bodyText, tags } = request.body;
+        const { headerText, bodyText, tags, headerHTML, bodyHTML } =
+          request.body;
         post.headerText = headerText;
+        post.headerHTML = headerHTML;
         post.bodyText = bodyText;
+        post.bodyHTML = bodyHTML;
         post.tags = tags;
         post.save();
         response.json(post);
       })
-      .catch((err) => response.status(400).json(err.message));
+      .catch(() =>
+        response.status(400).json(getErrorResponse("Post not found"))
+      );
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
+//function to pin a post
+exports.pinPost = async (request, response) => {
+  try {
+    Post.findById(request.params.id)
+      .then((post) => {
+        const { pin } = request.body;
+        post.pinned = pin;
+        post.save();
+        response.json(getSuccessResponse(post.pinned));
+      })
+      .catch(() =>
+        response.status(400).json(getErrorResponse("Post not found"))
+      );
+  } catch (err) {
+    response.status(400).json(err);
+  }
+};
+
+//function to save a post
+exports.savePost = async (request, response) => {
+  try {
+    Post.findById(request.params.id)
+      .then((post) => {
+        const { save } = request.body;
+        post.saved = save;
+        post.save();
+        response.json(getSuccessResponse(post.saved));
+      })
+      .catch(() =>
+        response.status(400).json(getErrorResponse("Post not found"))
+      );
   } catch (err) {
     response.status(400).json(err);
   }

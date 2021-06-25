@@ -10,6 +10,12 @@ router.post("/create-post", postController.createNewPost);
 // routes for updating a post.
 router.put("/:id/update-post", postController.updatePost);
 
+// routes for pining a post.
+router.put("/:id/pin-post", postController.pinPost);
+
+// routes for saving a post.
+router.put("/:id/save-post", postController.savePost);
+
 // routes for liking a post.
 router.put("/:id/like", postController.likePost);
 

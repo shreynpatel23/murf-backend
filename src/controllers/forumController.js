@@ -1,6 +1,6 @@
 const Forum = require("../modals/forum.modal");
 const Channel = require("../modals/channel.modal");
-const User = require("../modals/user.modal");
+const User = require("../modals/user");
 const defaultChannels = ["General", "Announcements", "News"];
 
 // Get forum by id controller

@@ -1,5 +1,4 @@
 import { Router as ExpressRouter } from "express";
-import { BadRequest } from "../common/responses";
 import AuthService from "../controllers/auth.controller";
 
 interface Router {

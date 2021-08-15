@@ -4,11 +4,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import AuthRouter from "./routes/auth.routes";
-import ForumController from "./routes/forumRoutes";
-import PostController from "./routes/postRoutes";
-import ChannelController from "./routes/channelRoutes";
-import CommentController from "./routes/commentRoutes";
-import verify from "./routes/verifyRoutes";
+import ForumRouter from "./routes/forum.routes";
+import ChannelRouter from "./routes/channel.routes";
+import CommentRouter from "./routes/comment.routes";
+import PostRouter from "./routes/post.routes";
 
 // use this command to configure the dotenv file.
 dotenv.config();
@@ -27,10 +26,10 @@ app.get("/", (_, res) => {
   res.send("Up!");
 });
 app.use(new AuthRouter().getRouter());
-app.use("/forums", verify, ForumController);
-app.use("/channels", verify, ChannelController);
-app.use("/posts", verify, PostController);
-app.use("/comments", verify, CommentController);
+app.use("/forums", new ForumRouter().getRouter());
+app.use("/channels", new ChannelRouter().getRouter());
+app.use("/posts", new PostRouter().getRouter());
+app.use("/comments", new CommentRouter().getRouter());
 // handle 404
 app.use("*", (_, res) => {
   res.status(404).send({

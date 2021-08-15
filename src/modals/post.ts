@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+import { Document, Types, model } from "mongoose";
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
@@ -52,5 +53,29 @@ const postSchema = new Schema(
   }
 );
 
-const Post = mongoose.model("Post", postSchema);
-module.exports = Post;
+export interface IPostSchema extends Document {
+  forumId: Types.ObjectId;
+  userId: Types.ObjectId;
+  channelId: Types.ObjectId;
+  liked: Liked;
+  headerText: string;
+  headerHTML: string;
+  bodyText: string;
+  bodyHTML: string;
+  tags: Array<string>;
+  comments: Array<string | Types.ObjectId>;
+  pinned: boolean;
+  saved: boolean;
+  _id: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+  _doc: Document;
+}
+
+interface Liked {
+  count: number;
+  isLiked: boolean;
+}
+
+const Post = model<IPostSchema>("Post", postSchema);
+export default Post;

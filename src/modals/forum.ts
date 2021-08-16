@@ -17,8 +17,16 @@ const forumSchema = new Schema(
     channels: {
       type: Array,
     },
+    createdBy: {
+      required: true,
+      type: {
+        name: String,
+        email: String,
+        Id: Types.ObjectId,
+      },
+    },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: Array,
       ref: "User",
       required: true,
     },
@@ -32,11 +40,18 @@ export interface IForumSchema extends Document {
   forum_name: string;
   theme: string;
   channels: Array<IChannelSchema>;
-  userId: Types.ObjectId;
+  userId: Array<string>;
+  createdBy: ICreatedBy;
   createdAt: Date;
   updatedAt: Date;
   _id: Types.ObjectId;
   _doc: Document;
+}
+
+export interface ICreatedBy {
+  name: string;
+  email: string;
+  Id: Types.ObjectId;
 }
 
 const Forum = model<IForumSchema>("Forum", forumSchema);

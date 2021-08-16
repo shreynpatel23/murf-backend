@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
-    // forumId: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "Forum",
-    // },
+    forumId: {
+      type: Schema.Types.ObjectId,
+      ref: "Forum",
+    },
     name: {
       type: String,
       required: true,
@@ -38,7 +38,7 @@ export interface IUserSchema extends Document {
   _id: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-  // forumId: Types.ObjectId;
+  forumId: Types.ObjectId;
   name: string;
   email: string;
   password: string;

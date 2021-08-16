@@ -23,6 +23,7 @@ const forumSchema = new Schema(
         name: String,
         email: String,
         Id: Types.ObjectId,
+        imageUrl: String,
       },
     },
     users: {
@@ -52,6 +53,7 @@ export interface ICreatedBy {
   name: string;
   email: string;
   Id: Types.ObjectId;
+  imageUrl: string;
 }
 
 const Forum = model<IForumSchema>("Forum", forumSchema);

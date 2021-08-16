@@ -107,11 +107,16 @@ export default class PostService {
     tags: Array<string>;
     headerHTML: string;
     bodyHTML: string;
+    userId: string;
     postId: string;
   }): Promise<IResponse> {
     // check if post is present or not
     const post: IPostSchema = await Post.findById(data.postId);
     if (!post) return BadRequest("The post you are looking for is not present");
+
+    // if user added post is not equal to the one updating it
+    if (data.userId !== post.userId.toString())
+      return BadRequest("Update not allowed");
 
     try {
       post.headerText = data.headerText;

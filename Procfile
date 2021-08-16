@@ -1,1 +1,1 @@
-web: node index.js
+web: --exec ts-node src/index.ts

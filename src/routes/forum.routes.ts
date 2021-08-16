@@ -65,7 +65,7 @@ export default class ForumRouter implements Router {
     });
 
     // routes for verifying email token
-    router.get("/invite-member/:token/:forum_id", verify, async (req, res) => {
+    router.get("/invite-member/:token/:forum_id", async (req, res) => {
       const { err, data, status } =
         await this.forumService.verifyTokenToAddMember(req, res);
       res.status(status).send({ err, data });

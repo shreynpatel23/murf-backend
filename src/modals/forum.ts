@@ -25,7 +25,7 @@ const forumSchema = new Schema(
         Id: Types.ObjectId,
       },
     },
-    userId: {
+    users: {
       type: Array,
       ref: "User",
       required: true,
@@ -40,7 +40,7 @@ export interface IForumSchema extends Document {
   forum_name: string;
   theme: string;
   channels: Array<IChannelSchema>;
-  userId: Array<string>;
+  users: Array<ICreatedBy>;
   createdBy: ICreatedBy;
   createdAt: Date;
   updatedAt: Date;

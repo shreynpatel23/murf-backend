@@ -1,6 +1,6 @@
 import { BadRequest, IResponse, OkResponse } from "../common/responses";
 import jwt from "jsonwebtoken";
-import Forum, { IForumSchema } from "../modals/forum";
+import Forum, { ICreatedBy, IForumSchema } from "../modals/forum";
 import Channel, { IChannelSchema } from "../modals/channel";
 import User, { IUserSchema } from "../modals/user";
 import { Request, Response } from "express";
@@ -46,7 +46,7 @@ export default class ForumService {
       });
       // update the created By object
       newForum.createdBy = { name: user.name, email: user.email, Id: user._id };
-      newForum.userId = [user._id.toString()];
+      newForum.users = [{ name: user.name, email: user.email, Id: user._id }];
       let channels: IChannelSchema[] = [];
       // create default channels for the forum.
       await Promise.all(
@@ -78,6 +78,14 @@ export default class ForumService {
     const forum: IForumSchema = await Forum.findById(data.forum_id);
     if (!forum) return BadRequest("Forum does not exist");
 
+    if (forum.createdBy.Id.toString() !== data.invited_by)
+      return BadRequest("You do not have permission to invite people");
+
+    const isUserPresent = forum.users.findIndex(
+      (addedUser: ICreatedBy) => addedUser.email === data.user_email
+    );
+    if (isUserPresent >= 0)
+      return BadRequest("User already added in the forum");
     try {
       // generate the email data and shoot the email
       const url = addMemberViaEmail(request, data.user_email, data.forum_id);
@@ -120,15 +128,19 @@ export default class ForumService {
       // else will verify the users email.
       const user: IUserSchema = await User.findOne({ email: id });
       if (!user) {
-        response.redirect("http://localhost:4000/sign-up");
+        // response.redirect("http://localhost:4000/sign-up");
         return BadRequest("User does not exist! please sign up");
       }
-
+      const newUser = {
+        Id: user._id,
+        name: user.name,
+        email: user.email,
+      };
       // find the forum to update the urserId Array
       const forum: IForumSchema = await Forum.findById(forum_id);
-      if (forum.userId.includes(user._id.toString()))
+      if (forum.users.includes(newUser))
         return BadRequest("User already added in the forum");
-      forum.userId.push(user._id.toString());
+      forum.users.push(newUser);
       forum.save();
       return OkResponse("User Added Successfully");
     } catch (err) {
@@ -143,8 +155,8 @@ export default class ForumService {
     let users: IUserSchema[] = [];
     try {
       await Promise.all(
-        forum.userId.map(async (userId: string) => {
-          const user: IUserSchema = await User.findById(userId).select(
+        forum.users.map(async (addedUser: ICreatedBy) => {
+          const user: IUserSchema = await User.findById(addedUser.Id).select(
             "name email imageUrl _id"
           );
           users.push(user);

@@ -1,6 +1,6 @@
 import { Router as ExpressRouter } from "express";
 import CommentService from "../controllers/comment.controller";
-
+import verify from "../routes/verifyRoutes";
 interface Router {
   getRouter(): ExpressRouter;
 }
@@ -12,7 +12,7 @@ export default class CommentRouter implements Router {
   constructor() {
     const { router } = CommentRouter;
     // routes for adding comment.
-    router.post("/add-comment", async (req, res) => {
+    router.post("/add-comment", verify, async (req, res) => {
       const { comment, postId } = req.body;
       if (typeof comment !== "string")
         return res
@@ -30,7 +30,7 @@ export default class CommentRouter implements Router {
     });
 
     // routes for deleting a comment
-    router.delete("/:id", async (req, res) => {
+    router.delete("/:id", verify, async (req, res) => {
       const { id } = req.params;
       const { postId } = req.body;
       if (typeof postId !== "string")

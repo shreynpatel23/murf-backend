@@ -21,7 +21,7 @@ export default class ChannelRouter implements Router {
     });
 
     // routes for creating a channel
-    router.post("/create-channel", async (req, res) => {
+    router.post("/create-channel", verify, async (req, res) => {
       const { channel_name, forumId } = req.body;
       if (typeof channel_name !== "string")
         return res
@@ -39,7 +39,7 @@ export default class ChannelRouter implements Router {
     });
 
     // routes for deleting a channel
-    router.delete("/delete-channel", async (req, res) => {
+    router.delete("/delete-channel", verify, async (req, res) => {
       const { channel_name, forumId } = req.body;
       if (typeof channel_name !== "string")
         return res

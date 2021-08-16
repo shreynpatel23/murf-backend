@@ -72,7 +72,7 @@ export interface IPostSchema extends Document {
   _doc: Document;
 }
 
-interface Liked {
+export interface Liked {
   count: number;
   isLiked: boolean;
 }

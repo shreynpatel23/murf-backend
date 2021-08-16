@@ -1,14 +1,18 @@
-const jwt = require("jsonwebtoken");
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
-module.exports = function (request, response, next) {
+export default function (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
   const token = request.header("authToken");
   if (!token) return response.status(401).send("Access Denied");
-
   try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-    request.user = verified;
+    response.locals.jwt = verified;
     next();
   } catch (err) {
     response.status(400).send("invalid Token");
   }
-};
+}

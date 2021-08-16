@@ -1,6 +1,6 @@
 const sgMail = require("@sendgrid/mail");
 
-const sendMail = (email, dynamic_template_date, template_id) => {
+export const sendMail = (email, dynamic_template_date, template_id) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const msg = {
     personalizations: [
@@ -28,5 +28,3 @@ const sendMail = (email, dynamic_template_date, template_id) => {
     .then((res) => res)
     .catch((err) => err);
 };
-
-module.exports = { sendMail };

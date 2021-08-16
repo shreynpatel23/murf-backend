@@ -4,24 +4,7 @@ import { sendMail } from "../utils/mail.helper";
 import bcrypt from "bcryptjs";
 import { OkResponse, BadRequest, IResponse } from "../common/responses";
 import { Request, Response } from "express";
-
-function getFullHostURL(req): String {
-  const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
-  const host = req.get("host");
-  return `${protocol}://${host}`;
-}
-
-// function to generate email verification url
-function generateEmailValidationUrl(req, id): String {
-  const url = getFullHostURL(req);
-  const current_date = new Date();
-  const expiry_time = current_date.getTime() + 30 * 60 * 1000; // 30 minutes
-  const email_token = jwt.sign(
-    { id: id, expires: expiry_time },
-    process.env.TOKEN_SECRET
-  );
-  return `${url}/verify/${email_token}`;
-}
+import { generateEmailValidationUrl } from "../common/urls";
 
 export default class AuthService {
   // function to Sign in using google
@@ -177,12 +160,12 @@ export default class AuthService {
       // check if the user is already verified
       if (user.isEmailVerified) return BadRequest("user is already verified");
       // generating the url
-      const data = generateEmailValidationUrl(request, user._id);
+      const url = generateEmailValidationUrl(request, user._id);
       // create Dynamic data for the email
       const dynamic_template_date = {
         subject: "Email Verification",
         name: user.name,
-        redirect_url: data,
+        redirect_url: url,
       };
       // sending mail
       sendMail(
@@ -210,7 +193,7 @@ export default class AuthService {
       const current_date = new Date();
       if (expires < current_date.getTime()) {
         response.redirect(
-          "http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null"
+          `http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null`
         );
         return BadRequest("Email Not Verified");
       }
@@ -218,7 +201,7 @@ export default class AuthService {
       const user: IUserSchema = await User.findOne({ _id: id });
       user.isEmailVerified = true;
       response.redirect(
-        "http://localhost:4000/login?err=null&status=200&data=Email Verified!"
+        `http://localhost:4000/login?err=null&status=200&data=Email Verified!`
       );
       user.save();
       return OkResponse("Email Verified");

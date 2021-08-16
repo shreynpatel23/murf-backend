@@ -1,4 +1,4 @@
-import { Router as ExpressRouter } from "express";
+import { request, Router as ExpressRouter } from "express";
 import ForumService from "../controllers/forum.controller";
 import verify from "../routes/verifyRoutes";
 
@@ -39,6 +39,43 @@ export default class ForumRouter implements Router {
         theme,
         userId,
       });
+      res.status(status).send({ err, data });
+    });
+
+    // routes for inviting a user in a forum
+    router.post("/invite-member", verify, async (req, res) => {
+      const { user_email, forum_id, invited_by } = req.body;
+      if (typeof user_email !== "string")
+        return res
+          .status(400)
+          .send({ err: "Email should be a string", data: null });
+      if (typeof forum_id !== "string")
+        return res
+          .status(400)
+          .send({ err: "Forum name should be a string", data: null });
+      if (typeof invited_by !== "string")
+        return res
+          .status(400)
+          .send({ err: "Invited by should be a string", data: null });
+      const { err, status, data } = await this.forumService.inviteMemberToForum(
+        { user_email, invited_by, forum_id },
+        req
+      );
+      res.status(status).send({ err, data });
+    });
+
+    // routes for verifying email token
+    router.get("/invite-member/:token/:forum_id", verify, async (req, res) => {
+      const { err, data, status } =
+        await this.forumService.verifyTokenToAddMember(req, res);
+      res.status(status).send({ err, data });
+    });
+
+    // routes for getting all users of a forum
+    router.get("/:id/members", verify, async (req, res) => {
+      const { id } = req.params;
+      const { err, data, status } =
+        await this.forumService.getAllMembersOfForum({ forumId: id });
       res.status(status).send({ err, data });
     });
   }

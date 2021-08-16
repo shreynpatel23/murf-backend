@@ -45,8 +45,20 @@ export default class ForumService {
         theme: data.theme,
       });
       // update the created By object
-      newForum.createdBy = { name: user.name, email: user.email, Id: user._id };
-      newForum.users = [{ name: user.name, email: user.email, Id: user._id }];
+      newForum.createdBy = {
+        name: user.name,
+        email: user.email,
+        Id: user._id,
+        imageUrl: user.imageUrl,
+      };
+      newForum.users = [
+        {
+          name: user.name,
+          email: user.email,
+          Id: user._id,
+          imageUrl: user.imageUrl,
+        },
+      ];
       let channels: IChannelSchema[] = [];
       // create default channels for the forum.
       await Promise.all(
@@ -60,7 +72,9 @@ export default class ForumService {
       );
       // use the new forum object to save the data in the database
       newForum.channels = channels;
-      await newForum.save();
+      newForum.save();
+      user.forumId = newForum._id;
+      user.save();
       return OkResponse(newForum);
     } catch (err) {
       return BadRequest(err.message);
@@ -135,6 +149,7 @@ export default class ForumService {
         Id: user._id,
         name: user.name,
         email: user.email,
+        imageUrl: user.imageUrl,
       };
       // find the forum to update the urserId Array
       const forum: IForumSchema = await Forum.findById(forum_id);
@@ -152,17 +167,8 @@ export default class ForumService {
   async getAllMembersOfForum(data: { forumId: string }): Promise<IResponse> {
     const forum: IForumSchema = await Forum.findById(data.forumId);
     if (!forum) return BadRequest("Forum not found");
-    let users: IUserSchema[] = [];
     try {
-      await Promise.all(
-        forum.users.map(async (addedUser: ICreatedBy) => {
-          const user: IUserSchema = await User.findById(addedUser.Id).select(
-            "name email imageUrl _id"
-          );
-          users.push(user);
-        })
-      );
-      return OkResponse(users);
+      return OkResponse(forum.users);
     } catch (err) {
       return BadRequest(err.message);
     }

@@ -1,7 +1,7 @@
 import { BadRequest, IResponse, OkResponse } from "../common/responses";
 import Channel, { IChannelSchema } from "../modals/channel";
 import Comment, { ICommentSchema } from "../modals/comment";
-import Forum, { IForumSchema } from "../modals/forum";
+import Forum, { ICreatedBy, IForumSchema } from "../modals/forum";
 import Post, { IPostSchema, Liked } from "../modals/post";
 
 export default class PostService {
@@ -60,13 +60,20 @@ export default class PostService {
 
     if (!forum) return BadRequest("Forum Does not exist");
 
+    // check if the user is added in the forum or not
+    const userIsAddedInForum = forum.users.findIndex(
+      (user: ICreatedBy) => user.Id.toString() === data.userId
+    );
+    if (userIsAddedInForum < 0)
+      return BadRequest("User is not added in forum!");
+
     try {
-      // create the post and save it in db
-      const newPost: IPostSchema = await new Post(data).save();
       // update the post id in channel
       const channel: IChannelSchema = await Channel.findById(data.channelId);
       // throw error if channel is not found
       if (!channel) return BadRequest("Channel not found");
+      // create the post and save it in db
+      const newPost: IPostSchema = await new Post(data).save();
       // update post id in the channel and save it in db
       channel.postIds = [...channel.postIds, newPost._id];
       channel.save();
@@ -100,11 +107,16 @@ export default class PostService {
     tags: Array<string>;
     headerHTML: string;
     bodyHTML: string;
+    userId: string;
     postId: string;
   }): Promise<IResponse> {
     // check if post is present or not
     const post: IPostSchema = await Post.findById(data.postId);
     if (!post) return BadRequest("The post you are looking for is not present");
+
+    // if user added post is not equal to the one updating it
+    if (data.userId !== post.userId.toString())
+      return BadRequest("Update not allowed");
 
     try {
       post.headerText = data.headerText;

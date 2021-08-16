@@ -60,6 +60,7 @@ export default class PostRouter implements Router {
         tags: Array<string>;
         headerHTML: string;
         bodyHTML: string;
+        userId: string;
       } = req.body;
       const { err, data, status } = await this.postService.updatePost({
         ...post,

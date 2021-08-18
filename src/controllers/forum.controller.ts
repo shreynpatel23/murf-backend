@@ -73,7 +73,7 @@ export default class ForumService {
       // use the new forum object to save the data in the database
       newForum.channels = channels;
       newForum.save();
-      user.forumId = newForum._id;
+      user.forumId.push(newForum._id.toString());
       user.save();
       return OkResponse(newForum);
     } catch (err) {
@@ -155,6 +155,8 @@ export default class ForumService {
       const forum: IForumSchema = await Forum.findById(forum_id);
       if (forum.users.includes(newUser))
         return BadRequest("User already added in the forum");
+      user.forumId.push(forum._id.toString());
+      user.save();
       forum.users.push(newUser);
       forum.save();
       return OkResponse("User Added Successfully");

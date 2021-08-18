@@ -8,6 +8,7 @@ import ForumRouter from "./routes/forum.routes";
 import ChannelRouter from "./routes/channel.routes";
 import CommentRouter from "./routes/comment.routes";
 import PostRouter from "./routes/post.routes";
+import { UserRouter } from "./routes/user.routes";
 
 // use this command to configure the dotenv file.
 dotenv.config();
@@ -26,6 +27,7 @@ app.get("/", (_, res) => {
   res.send("Up!");
 });
 app.use(new AuthRouter().getRouter());
+app.use("/user", new UserRouter().getRouter());
 app.use("/forums", new ForumRouter().getRouter());
 app.use("/channels", new ChannelRouter().getRouter());
 app.use("/posts", new PostRouter().getRouter());

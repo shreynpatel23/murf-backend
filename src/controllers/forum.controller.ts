@@ -159,6 +159,7 @@ export default class ForumService {
       user.save();
       forum.users.push(newUser);
       forum.save();
+      response.redirect("http://localhost:4000/login");
       return OkResponse("User Added Successfully");
     } catch (err) {
       return BadRequest(err.message);

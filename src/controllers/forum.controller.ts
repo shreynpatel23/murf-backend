@@ -4,7 +4,7 @@ import Forum, { ICreatedBy, IForumSchema } from "../modals/forum";
 import Channel, { IChannelSchema } from "../modals/channel";
 import User, { IUserSchema } from "../modals/user";
 import { Request, Response } from "express";
-import { addMemberViaEmail } from "../common/urls";
+import { addMemberViaEmail, getFullHostURL } from "../common/urls";
 import { sendMail } from "../utils/mail.helper";
 
 const defaultChannels = ["General", "Announcements", "News"];
@@ -130,15 +130,16 @@ export default class ForumService {
       // Check whether expiry time is less than current time
       // if less than we will show that Link is expired
       const current_date = new Date();
+      const url = getFullHostURL(request);
       if (expires < current_date.getTime())
         return response.redirect(
-          "http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null"
+          `${url}/email-not-verified?err=Link Expired!&status=400&data=null`
         );
       // else will verify the users email.
       const user: IUserSchema = await User.findOne({ email: id });
       if (!user)
         return response.redirect(
-          "http://localhost:4000/sign-up?err=User does not exist! please sign up!&status=400&data=null"
+          `${url}/sign-up?err=User does not exist! please sign up!&status=400&data=null`
         );
       const newUser = {
         Id: user._id,
@@ -150,14 +151,14 @@ export default class ForumService {
       const forum: IForumSchema = await Forum.findById(forum_id);
       if (forum.users.includes(newUser))
         return response.redirect(
-          "http://localhost:4000/login?err=User already added in the forum!&status=400&data=null"
+          `${url}/login?err=User already added in the forum!&status=400&data=null`
         );
       user.forumId.push(forum._id.toString());
       user.save();
       forum.users.push(newUser);
       forum.save();
       return response.redirect(
-        "http://localhost:4000/login?err=null&status=200&data=User Added Successfully"
+        `${url}/login?err=null&status=200&data=User Added Successfully`
       );
     } catch (err) {
       return response.status(400).send({ err: err.message, data: null });

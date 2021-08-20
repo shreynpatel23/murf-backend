@@ -123,28 +123,23 @@ export default class ForumService {
   }
 
   // verify token for member invite email
-  async verifyTokenToAddMember(
-    request: Request,
-    response: Response
-  ): Promise<IResponse> {
+  async verifyTokenToAddMember(request: Request, response: Response) {
     try {
       const { token, forum_id } = request.params;
       const { id, expires } = jwt.verify(token, process.env.TOKEN_SECRET);
       // Check whether expiry time is less than current time
       // if less than we will show that Link is expired
       const current_date = new Date();
-      if (expires < current_date.getTime()) {
-        response.redirect(
+      if (expires < current_date.getTime())
+        return response.redirect(
           "http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null"
         );
-        return BadRequest("Link Expired");
-      }
       // else will verify the users email.
       const user: IUserSchema = await User.findOne({ email: id });
-      if (!user) {
-        // response.redirect("http://localhost:4000/sign-up");
-        return BadRequest("User does not exist! please sign up");
-      }
+      if (!user)
+        return response.redirect(
+          "http://localhost:4000/sign-up?err=User does not exist! please sign up!&status=400&data=null"
+        );
       const newUser = {
         Id: user._id,
         name: user.name,
@@ -154,15 +149,18 @@ export default class ForumService {
       // find the forum to update the urserId Array
       const forum: IForumSchema = await Forum.findById(forum_id);
       if (forum.users.includes(newUser))
-        return BadRequest("User already added in the forum");
+        return response.redirect(
+          "http://localhost:4000/login?err=User already added in the forum!&status=400&data=null"
+        );
       user.forumId.push(forum._id.toString());
       user.save();
       forum.users.push(newUser);
       forum.save();
-      response.redirect("http://localhost:4000/login");
-      return OkResponse("User Added Successfully");
+      return response.redirect(
+        "http://localhost:4000/login?err=null&status=200&data=User Added Successfully"
+      );
     } catch (err) {
-      return BadRequest(err.message);
+      return response.status(400).send({ err: err.message, data: null });
     }
   }
 

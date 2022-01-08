@@ -191,9 +191,10 @@ export default class AuthService {
       // Check whether expiry time is less than current time
       // if less than we will show that Link is expired
       const current_date = new Date();
+      const url = process.env.MURF_FRONTEND_HOST;
       if (expires < current_date.getTime()) {
         response.redirect(
-          `http://localhost:4000/email-not-verified?err=Link Expired!&status=400&data=null`
+          `${url}/email-not-verified?err=Link Expired!&status=400&data=null`
         );
         return BadRequest("Email Not Verified");
       }
@@ -201,7 +202,7 @@ export default class AuthService {
       const user: IUserSchema = await User.findOne({ _id: id });
       user.isEmailVerified = true;
       response.redirect(
-        `http://localhost:4000/login?err=null&status=200&data=Email Verified!`
+        `${url}/login?err=null&status=200&data=Email Verified!`
       );
       user.save();
       return OkResponse("Email Verified");

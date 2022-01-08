@@ -4,7 +4,7 @@ import Forum, { ICreatedBy, IForumSchema } from "../modals/forum";
 import Channel, { IChannelSchema } from "../modals/channel";
 import User, { IUserSchema } from "../modals/user";
 import { Request, Response } from "express";
-import { addMemberViaEmail, getFullHostURL } from "../common/urls";
+import { addMemberViaEmail } from "../common/urls";
 import { sendMail } from "../utils/mail.helper";
 
 const defaultChannels = ["General", "Announcements", "News"];
@@ -130,7 +130,7 @@ export default class ForumService {
       // Check whether expiry time is less than current time
       // if less than we will show that Link is expired
       const current_date = new Date();
-      const url = getFullHostURL(request);
+      const url = process.env.MURF_FRONTEND_HOST;
       if (expires < current_date.getTime())
         return response.redirect(
           `${url}/email-not-verified?err=Link Expired!&status=400&data=null`

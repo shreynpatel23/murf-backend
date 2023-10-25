@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "engines": {
-    "node": "18.18.0"
+    "node": "18.x"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.4",
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "start": "nodemon --exec ts-node src/index.ts"
+    "start": "node --exec ts-node src/index.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

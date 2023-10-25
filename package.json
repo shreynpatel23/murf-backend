@@ -22,7 +22,8 @@
   },
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "start": "nodemon --exec ts-node src/index.ts"
+    "start": "nodemon --exec ts-node src/index.ts",
+    "start-production": "nodemon --exec ts-node ./dist/index.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

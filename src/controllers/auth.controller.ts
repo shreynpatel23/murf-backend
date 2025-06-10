@@ -120,23 +120,23 @@ export default class AuthService {
         name: data.user_name,
         email: data.user_email,
         password: hashedPassword,
-        isEmailVerified: false,
+        isEmailVerified: true,
         imageUrl: "",
       }).save();
       const token = jwt.sign({ id: newUser._id }, process.env.TOKEN_SECRET);
       const url = generateEmailValidationUrl(request, newUser._id);
-      // create Dynamic data for the email
-      const dynamic_template_date = {
-        subject: "Email Verification",
-        name: newUser.name,
-        redirect_url: url,
-      };
-      // send email
-      sendMail(
-        newUser.email,
-        dynamic_template_date,
-        "d-7477f4e6aaa4487aaf575433da69bf61"
-      );
+      // // create Dynamic data for the email
+      // const dynamic_template_date = {
+      //   subject: "Email Verification",
+      //   name: newUser.name,
+      //   redirect_url: url,
+      // };
+      // // send email
+      // sendMail(
+      //   newUser.email,
+      //   dynamic_template_date,
+      //   "d-7477f4e6aaa4487aaf575433da69bf61"
+      // );
       return OkResponse({ ...newUser._doc, token });
     } catch (err) {
       return BadRequest(err.message);
